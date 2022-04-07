@@ -2,7 +2,13 @@
 """
 from train_test import train_test
 
-if __name__ == "__main__":    
+if __name__ == "__main__":   
+    """
+    训练MOGONET分类任务示例
+    
+    """
+    
+    #在这里调整超参数
     data_folder = 'ROSMAP'
     view_list = [1,2,3]
     num_epoch_pretrain = 500
@@ -15,7 +21,7 @@ if __name__ == "__main__":
         num_class = 2
     if data_folder == 'BRCA':
         num_class = 5
-    
+    # 运行训练模型
     train_test(data_folder, view_list, num_class,
                lr_e_pretrain, lr_e, lr_c, 
                num_epoch_pretrain, num_epoch)             
