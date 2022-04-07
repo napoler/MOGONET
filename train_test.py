@@ -59,7 +59,11 @@ def gen_trte_adj_mat(data_tr_list, data_trte_list, trte_idx, adj_parameter):
 
 
 def train_epoch(data_list, adj_list, label, one_hot_label, sample_weight, model_dict, optim_dict, train_VCDN=True):
+    """
+    进行单轮迭代的代码
+    """
     loss_dict = {}
+    # 损失函数,交叉熵
     criterion = torch.nn.CrossEntropyLoss(reduction='none')
     for m in model_dict:
         model_dict[m].train()    
@@ -88,6 +92,9 @@ def train_epoch(data_list, adj_list, label, one_hot_label, sample_weight, model_
     
 
 def test_epoch(data_list, adj_list, te_idx, model_dict):
+    """
+    测试模型,将模型设置为验证模式,返回概率numpy格式
+    """
     for m in model_dict:
         model_dict[m].eval()
     num_view = len(data_list)
@@ -107,6 +114,9 @@ def test_epoch(data_list, adj_list, te_idx, model_dict):
 def train_test(data_folder, view_list, num_class,
                lr_e_pretrain, lr_e, lr_c, 
                num_epoch_pretrain, num_epoch):
+    """
+    训练核心代码
+    """
     test_inverval = 50
     num_view = len(view_list)
     dim_hvcdn = pow(num_class,num_view)
@@ -116,6 +126,7 @@ def train_test(data_folder, view_list, num_class,
     if data_folder == 'BRCA':
         adj_parameter = 10
         dim_he_list = [400,400,200]
+    # 预处理数据集
     data_tr_list, data_trte_list, trte_idx, labels_trte = prepare_trte_data(data_folder, view_list)
     labels_tr_tensor = torch.LongTensor(labels_trte[trte_idx["tr"]])
     onehot_labels_tr_tensor = one_hot_tensor(labels_tr_tensor, num_class)
@@ -127,27 +138,32 @@ def train_test(data_folder, view_list, num_class,
         sample_weight_tr = sample_weight_tr.cuda()
     adj_tr_list, adj_te_list = gen_trte_adj_mat(data_tr_list, data_trte_list, trte_idx, adj_parameter)
     dim_list = [x.shape[1] for x in data_tr_list]
+    # 初始化模型
     model_dict = init_model_dict(num_view, num_class, dim_list, dim_he_list, dim_hvcdn)
     for m in model_dict:
         if cuda:
             model_dict[m].cuda()
     
     print("\nPretrain GCNs...")
+    # 预训练阶段
     optim_dict = init_optim(num_view, model_dict, lr_e_pretrain, lr_c)
     for epoch in range(num_epoch_pretrain):
         train_epoch(data_tr_list, adj_tr_list, labels_tr_tensor, 
                     onehot_labels_tr_tensor, sample_weight_tr, model_dict, optim_dict, train_VCDN=False)
     print("\nTraining...")
+    #训练模型阶段
     optim_dict = init_optim(num_view, model_dict, lr_e, lr_c)
     for epoch in range(num_epoch+1):
+        # 单轮迭代
         train_epoch(data_tr_list, adj_tr_list, labels_tr_tensor, 
                     onehot_labels_tr_tensor, sample_weight_tr, model_dict, optim_dict)
         
-        # 保存模型
-        from utils import save_model_dict
-        folder="out"
-        save_model_dict(folder, model_dict)
-    
+#         # 保存模型
+       
+#         from utils import save_model_dict
+#         folder="out"
+#         save_model_dict(folder, model_dict)
+        # 测试模型效果
         if epoch % test_inverval == 0:
             te_prob = test_epoch(data_trte_list, adj_te_list, trte_idx["te"], model_dict)
             print("\nTest: Epoch {:d}".format(epoch))
@@ -161,3 +177,7 @@ def train_test(data_folder, view_list, num_class,
                 print("Test F1 macro: {:.3f}".format(f1_score(labels_trte[trte_idx["te"]], te_prob.argmax(1), average='macro')))
             print()
 
+    # 保存模型
+    from utils import save_model_dict
+    folder="out"
+    save_model_dict(folder, model_dict)
