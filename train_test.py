@@ -154,3 +154,7 @@ def train_test(data_folder, view_list, num_class,
                 print("Test F1 weighted: {:.3f}".format(f1_score(labels_trte[trte_idx["te"]], te_prob.argmax(1), average='weighted')))
                 print("Test F1 macro: {:.3f}".format(f1_score(labels_trte[trte_idx["te"]], te_prob.argmax(1), average='macro')))
             print()
+     # 保存模型
+    from .utils import save_model_dict
+    folder="out"
+    save_model_dict(folder, model_dict)
