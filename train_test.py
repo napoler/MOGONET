@@ -12,6 +12,9 @@ cuda = True if torch.cuda.is_available() else False
 
 
 def prepare_trte_data(data_folder, view_list):
+    """
+    预处理数据
+    """
     num_view = len(view_list)
     labels_tr = np.loadtxt(os.path.join(data_folder, "labels_tr.csv"), delimiter=',')
     labels_te = np.loadtxt(os.path.join(data_folder, "labels_te.csv"), delimiter=',')
