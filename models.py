@@ -34,6 +34,9 @@ class GraphConvolution(nn.Module):
     
 
 class GCN_E(nn.Module):
+    """
+    图卷积网络
+    """
     def __init__(self, in_dim, hgcn_dim, dropout):
         super().__init__()
         self.gc1 = GraphConvolution(in_dim, hgcn_dim[0])
@@ -55,6 +58,9 @@ class GCN_E(nn.Module):
 
 
 class Classifier_1(nn.Module):
+    """
+    分类模型
+    """
     def __init__(self, in_dim, out_dim):
         super().__init__()
         self.clf = nn.Sequential(nn.Linear(in_dim, out_dim))
@@ -66,6 +72,10 @@ class Classifier_1(nn.Module):
 
 
 class VCDN(nn.Module):
+    """
+    VCDN模型
+    
+    """
     def __init__(self, num_view, num_cls, hvcdn_dim):
         super().__init__()
         self.num_cls = num_cls
@@ -90,6 +100,9 @@ class VCDN(nn.Module):
 
     
 def init_model_dict(num_view, num_class, dim_list, dim_he_list, dim_hc, gcn_dopout=0.5):
+    """
+    初始化模型
+    """
     model_dict = {}
     for i in range(num_view):
         model_dict["E{:}".format(i+1)] = GCN_E(dim_list[i], dim_he_list, gcn_dopout)
@@ -100,6 +113,10 @@ def init_model_dict(num_view, num_class, dim_list, dim_he_list, dim_hc, gcn_dopo
 
 
 def init_optim(num_view, model_dict, lr_e=1e-4, lr_c=1e-4):
+    """
+    初始化优化器
+    
+    """
     optim_dict = {}
     for i in range(num_view):
         optim_dict["C{:}".format(i+1)] = torch.optim.Adam(
