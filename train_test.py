@@ -8,6 +8,8 @@ import torch.nn.functional as F
 from models import init_model_dict, init_optim
 from utils import one_hot_tensor, cal_sample_weight, gen_adj_mat_tensor, gen_test_adj_mat_tensor, cal_adj_mat_parameter
 
+
+#检测cuda是否可用,
 cuda = True if torch.cuda.is_available() else False
 
 
