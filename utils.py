@@ -116,6 +116,9 @@ def gen_test_adj_mat_tensor(data, trte_idx, parameter, metric="cosine"):
 
 
 def save_model_dict(folder, model_dict):
+    """
+    保存模型参数
+    """
     if not os.path.exists(folder):
         os.makedirs(folder)
     for module in model_dict:
@@ -123,6 +126,9 @@ def save_model_dict(folder, model_dict):
             
     
 def load_model_dict(folder, model_dict):
+    """
+    加载模型参数
+    """
     for module in model_dict:
         if os.path.exists(os.path.join(folder, module+".pth")):
 #            print("Module {:} loaded!".format(module))
